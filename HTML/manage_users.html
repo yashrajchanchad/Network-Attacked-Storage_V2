@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles for the modal and form */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 40%;
+            max-width: 600px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-group input[type="text"], .form-group input[type="email"], .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .input-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 40px;
+        }
+
+        .tag {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tag .remove-tag {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .dropdown-select {
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            position: absolute;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-select option {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-select option:hover {
+            background-color: #ecf0f1;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .save-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-panel">
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="manage_users.html">Manage Users</a>
+        <a href="manage_roles.html">Manage Roles</a>
+        <a href="change_password.html">Change Password</a>
+        <a href="" class="file-access-btn">File Access Storage</a>
+        <a href="#">Logout</a>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <header>Manage Users</header>
+            <button class="create-btn" id="createUserBtn">Create User</button>
+        </div>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>johndoe@example.com</td>
+                <td>Admin</td>
+                <td>
+                    <button class="view-btn" onclick="viewUserProfile(1)">View</button>
+                    <button class="edit-btn" onclick="openEditUserModal(1)">Edit</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Jane Smith</td>
+                <td>janesmith@example.com</td>
+                <td>User</td>
+                <td>
+                    <button class="view-btn" onclick="viewUserProfile(2)">View</button>
+                    <button class="edit-btn" onclick="openEditUserModal(2)">Edit</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Creating New User -->
+<div id="createUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeCreateModal">&times;</span>
+        <h2>Create New User</h2>
+        <form>
+            <div class="form-group">
+                <label for="user-name">Name</label>
+                <input type="text" id="user-name" name="user-name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="roles">Select Roles</label>
+                <div id="roleTags" class="input-tags"></div>
+                <input id="role-input" type="text" placeholder="Add role" autocomplete="off" />
+                <div id="roleDropdown" class="dropdown-select">
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                    <option value="viewer">Viewer</option>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="cancel-btn" id="cancelCreateBtn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for Editing User -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeEditModal">&times;</span>
+        <h2>Edit User</h2>
+        <form>
+            <div class="form-group">
+                <label for="edit-user-name">Name</label>
+                <input type="text" id="edit-user-name" value="John Doe" required>
+                
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email</label>
+                <input type="email" id="edit-email" value="johndoe@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-role">Role</label>
+                <input type="text" id="edit-role" value="Admin" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="cancel-btn" id="cancelEditBtn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Open and Close Modals
+    const createUserBtn = document.getElementById('createUserBtn');
+    const createUserModal = document.getElementById('createUserModal');
+    const closeCreateModal = document.getElementById('closeCreateModal');
+    const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+
+    const editUserModal = document.getElementById('editUserModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+    const roleInput = document.getElementById('role-input');
+    const roleDropdown = document.getElementById('roleDropdown');
+    const roleTags = document.getElementById('roleTags');
+
+    // Open modal for creating a user
+    createUserBtn.onclick = function() {
+        createUserModal.style.display = 'block';
+    };
+
+    // Close create user modal
+    closeCreateModal.onclick = function() {
+        createUserModal.style.display = 'none';
+    };
+    cancelCreateBtn.onclick = function() {
+        createUserModal.style.display = 'none';
+    };
+
+    // Role selection logic
+    roleInput.addEventListener('focus', function() {
+        roleDropdown.style.display = 'block';
+    });
+
+    roleDropdown.addEventListener('click', function(event) {
+        if (event.target.tagName === 'OPTION') {
+            const value = event.target.value;
+            const text = event.target.innerText;
+
+            // Create tag element
+            const tag = document.createElement('div');
+            tag.classList.add('tag');
+            tag.innerHTML = `<span>${text}</span><span class="remove-tag">&times;</span>`;
+
+            // Append tag to the roleTags container
+            roleTags.appendChild(tag);
+
+            // Remove option from dropdown
+            event.target.style.display = 'none';
+
+            // Remove tag on click of the cross button
+            tag.querySelector('.remove-tag').addEventListener('click', function() {
+                roleTags.removeChild(tag);
+                event.target.style.display = 'block'; // Show the option again
+            });
+        }
+    });
+
+    // Close dropdown if clicked outside
+    window.addEventListener('click', function(event) {
+        if (!roleDropdown.contains(event.target) && event.target !== roleInput) {
+            roleDropdown.style.display = 'none';
+        }
+    });
+
+    // Open modal for editing a user
+    function openEditUserModal(userId) {
+        editUserModal.style.display = 'block';
+        // Load user data based on userId, here it's hardcoded for demonstration
+        document.getElementById('edit-user-name').value = 'John Doe';
+        document.getElementById('edit-email').value = 'johndoe@example.com';
+        document.getElementById('edit-role').value = 'Admin';
+    }
+
+    // Close edit user modal
+    closeEditModal.onclick = function() {
+        editUserModal.style.display = 'none';
+    };
+    cancelEditBtn.onclick = function() {
+        editUserModal.style.display = 'none';
+    };
+
+    // Function to handle viewing a user's profile
+    function viewUserProfile(userId) {
+        window.location.href = `user_profile.html?user=${userId}`;
+    }
+</script>
+
+</body>
+</html>

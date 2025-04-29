@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Profile Page Styling */
+        .profile-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header h2 {
+            margin: 0;
+            color: #3498db;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: 10px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .profile-info input[type="text"], .profile-info input[type="email"], .profile-info input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .show-password {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .show-password input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-top: 20px;
+        }
+
+        .save-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2>Edit Profile</h2>
+        </div>
+        <form>
+            <div class="profile-info">
+                <label for="user-name">Name</label>
+                <input type="text" id="user-name" value="John Doe">
+            </div>
+            <div class="profile-info">
+                <label for="email">Email</label>
+                <input type="email" id="email" value="johndoe@example.com">
+            </div>
+            <div class="profile-info">
+                <label for="role">Role</label>
+                <input type="text" id="role" value="Admin" disabled>
+            </div>
+            <div class="profile-info">
+                <label for="password">Password</label>
+                <input type="password" id="password" value="password123">
+                <div class="show-password">
+                    <input type="checkbox" id="showPassword" onclick="togglePassword()"> 
+                    <label for="showPassword">Show Password</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="save-btn">Save</button>
+                <button type="button" class="cancel-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Toggle the visibility of the password field
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const showPasswordCheckbox = document.getElementById('showPassword');
+        if (showPasswordCheckbox.checked) {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    }
+</script>
+
+</body>
+</html>

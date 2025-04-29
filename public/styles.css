@@ -1,0 +1,165 @@
+body {
+  user-select: none;
+  font-family: Arial, sans-serif;
+  margin: 0 1.5rem;
+}
+h1 {
+  color: #333;
+}
+#main{
+  display: flex;
+  gap: 1rem;
+}
+form {
+  margin-bottom: 20px;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+li {
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  height: fit-content;
+  min-width: 8rem;
+  flex-direction: column;
+}
+li>span{
+  overflow: scroll;
+  margin: 0.5rem;
+}
+.preview{
+  width: 10rem;
+  height: auto;
+}
+.folder, .file{
+  width: 4rem;
+  height: auto;
+}
+.path{
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgb(140, 209, 219);
+  padding: 1rem 0.5rem;
+  border-radius: 4px;
+  z-index: 10;
+}
+.new-items-create{
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: sticky;
+  top: 2rem;
+  max-width: 16rem;
+}
+#uploadForm,
+#folderUploadForm,
+#createFolderForm{
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+#fileList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.file-item img {
+  margin-right: 10px;
+}
+
+.file-item.selected {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+button {
+  margin-left: 10px;
+}
+
+#detailsPanel {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#breadcrumb span {
+  cursor: pointer;
+  color: #007bff;
+  margin-right: 5px;
+}
+
+#breadcrumb span:hover {
+  text-decoration: underline;
+}
+
+.details-name,
+.details-path{
+  overflow-x: scroll;
+}
+
+.storage-capacity{
+  height: 6px;
+  border-radius: 5px;
+  width: 100%;
+  display: flex;
+}
+
+.ocupancy{
+  background-color: steelblue;
+  height: 6px;
+}
+
+.full{
+  background-color: #000;
+  height: 6px;
+}
+
+.header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1{
+  color: #2980b9;
+}
+
+#dashboard-btn{
+  padding: 8px 16px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: background-color 0.3s ease;
+  font-size: 1.1rem;
+}
+
+#dashboard-btn:hover {
+  background-color: #2980b9;
+}

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Roles</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Style for the modal and form */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-group input[type="text"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .input-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 40px;
+        }
+
+        .tag {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tag .remove-tag {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .dropdown-select {
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            position: absolute;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .dropdown-select option {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-select option:hover {
+            background-color: #ecf0f1;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .save-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .create-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .create-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-panel">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="manage_users.html">Manage Users</a>
+            <a href="manage_roles.html">Manage Roles</a>
+            <a href="change_password.html">Change Password</a>
+            <a href="/" class="file-access-btn">File Access Storage</a>
+            <a href="#" id="logout">Logout</a>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <header>Manage Roles</header>
+                <button class="create-btn">Create Role</button>
+            </div>
+            <table id="user-table">
+                <tr>
+                    <th>ID</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Actions</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Modal for Creating New Role -->
+    <div id="createRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCreateModal">&times;</span>
+            <h2>Create New Role</h2>
+            <form id="createRoleForm">
+                <div class="form-group">
+                    <label for="role-name">Role Name</label>
+                    <input type="text" id="create-role-name" name="role-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="permissions">Select Permissions</label>
+                    <div id="createInputTags" class="input-tags"></div>
+                    <input id="createPermissionInput" type="text" placeholder="Add permission" autocomplete="off" />
+                    <div id="createPermissionDropdown" class="dropdown-select">
+                        <option value="read">Read</option>
+                        <option value="write">Write</option>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="create-role-btn">Save</button>
+                    <button type="button" class="cancel-btn" id="cancelCreateBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing and Editing Role Permissions -->
+    <div id="viewRoleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeViewModal">&times;</span>
+            <h2>Edit Role and Permissions</h2>
+            <form>
+                <div class="form-group">
+                    <label for="role-name">Role Name</label>
+                    <input type="text" id="role-name" name="role-name" required>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="permissions">Edit Permissions</label>
+                    <div id="inputTags" class="input-tags"></div>
+                    <input id="permission-input" type="text" placeholder="Add permission" autocomplete="off" />
+                    <div id="permissionDropdown" class="dropdown-select">
+                        <option value="read">Read</option>
+                        <option value="write">Write</option>
+                    </div>
+                </div> -->
+                <p><strong>Permissions:</strong> <span id="role-permissions"></span></p>
+                <p><strong>Created At:</strong> <span id="role-createdAt"></span></p>
+                <div class="modal-footer">
+                    <button type="submit" class="save-btn">Okay</button>
+                    <!-- <button type="button" class="cancel-btn" id="cancelViewBtn">Cancel</button> -->
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Table -->
+    <script defer>
+        const userLoggedIn = sessionStorage.getItem('nas-token');
+        if(!userLoggedIn) window.location.href = '/login.html';
+
+        const table = document.getElementById('user-table');
+        let roles = [];
+        const fetchDashboardData = async () => {
+            const data = fetch('/admin/rolesAll')
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        res.roles.forEach(role => {
+                            roles.push(role);
+                            const row = `
+                        <tr>
+                            <td>${role._id}</td>
+                            <td>${role.role}</td>
+                            <td>${role.permissions}</td>
+                            <td>
+                                <button class="view-btn" onclick="openViewModal('${role._id}')">View</button>
+                                <button onclick="deleteUser('${role._id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                            table.insertAdjacentHTML('beforeend', row);
+                        });
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        fetchDashboardData();
+
+        // Open the Create Role Modal
+        const createRoleBtn = document.querySelector('.create-btn');
+        const createRoleModal = document.getElementById('createRoleModal');
+        const closeCreateModal = document.getElementById('closeCreateModal');
+        const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+        let selectedRoles = [];
+
+        createRoleBtn.onclick = function () {
+            createRoleModal.style.display = 'block';
+        };
+
+        closeCreateModal.onclick = function () {
+            createRoleModal.style.display = 'none';
+        };
+        cancelCreateBtn.onclick = function () {
+            createRoleModal.style.display = 'none';
+        };
+
+        // Close View/Edit Role Modal
+        document.getElementById('closeViewModal').onclick = function () {
+            document.getElementById('viewRoleModal').style.display = 'none';
+        };
+
+        // Create Role Permission Selection Logic
+        const createPermissionInput = document.getElementById('createPermissionInput');
+        const createPermissionDropdown = document.getElementById('createPermissionDropdown');
+        createPermissionInput.addEventListener('focus', function () {
+            createPermissionDropdown.style.display = 'block';
+        });
+
+        createPermissionDropdown.addEventListener('click', function (event) {
+            if (event.target.tagName === 'OPTION') {
+                const permission = event.target.value;
+
+                // Add permission as a tag
+                const tag = document.createElement('div');
+                tag.classList.add('tag');
+                tag.innerHTML = `<span>${permission}</span><span class="remove-tag">&times;</span>`;
+                document.getElementById('createInputTags').appendChild(tag);
+
+                // Hide the permission from dropdown
+                event.target.style.display = 'none';
+
+                // Remove permission on click of the cross button
+                tag.querySelector('.remove-tag').addEventListener('click', function () {
+                    document.getElementById('createInputTags').removeChild(tag);
+                    event.target.style.display = 'block'; // Show the permission again
+                });
+            }
+        });
+
+        // Simulated View/Edit modal logic (same as previous response)
+        // function openViewModal(roleId) {
+        //     const modal = document.getElementById('viewRoleModal');
+        //     const roleNameInput = document.getElementById('role-name');
+        //     const inputTags = document.getElementById('inputTags');
+        //     const permissionDropdown = document.getElementById('permissionDropdown');
+
+        //     modal.style.display = 'block';
+
+        //     // Populate role name and permissions
+        //     console.log(roleId);
+        //     roleNameInput.value = roles[roleId].role;
+        //     inputTags.innerHTML = '';
+        //     permissionDropdown.querySelectorAll('option').forEach(option => {
+        //         option.style.display = 'block';  // Reset all options to be visible
+        //     });
+
+        //     roles[roleId].permissions.forEach(permission => {
+        //         // Add already assigned permissions as tags
+        //         const tag = document.createElement('div');
+        //         tag.classList.add('tag');
+        //         tag.innerHTML = `<span>${permission}</span><span class="remove-tag">&times;</span>`;
+        //         inputTags.appendChild(tag);
+
+        //         // Hide the assigned permission from the dropdown
+        //         const optionToHide = document.querySelector(`#permissionDropdown option[value="${permission}"]`);
+        //         if (optionToHide) {
+        //             optionToHide.style.display = 'none';
+        //         }
+
+        //         // Remove permission tag on click
+        //         tag.querySelector('.remove-tag').addEventListener('click', function () {
+        //             inputTags.removeChild(tag);
+        //             optionToHide.style.display = 'block';  // Show the option again
+        //         });
+        //     });
+        // }
+
+        // Permission selection logic for View/Edit Role Modal
+        const permissionInput = document.querySelector('#permission-input');
+        const permissionDropdown = document.querySelector('#permissionDropdown');
+        permissionInput.addEventListener('focus', function () {
+            permissionDropdown.style.display = 'block';
+        });
+
+        permissionDropdown.addEventListener('click', function (event) {
+            if (event.target.tagName === 'OPTION') {
+                const permission = event.target.value;
+
+                // Add permission as a tag
+                const tag = document.createElement('div');
+                tag.classList.add('tag');
+                tag.innerHTML = `<span>${permission}</span><span class="remove-tag">&times;</span>`;
+                document.getElementById('inputTags').appendChild(tag);
+
+                // Hide the permission from dropdown
+                event.target.style.display = 'none';
+
+                // Remove permission on click of the cross button
+                tag.querySelector('.remove-tag').addEventListener('click', function () {
+                    document.getElementById('inputTags').removeChild(tag);
+                    event.target.style.display = 'block'; // Show the permission again
+                });
+            }
+        });
+
+        // Close modal for View/Edit Role
+        // document.querySelector('#closeViewModal').onclick = function () {
+        //     document.getElementById('viewRoleModal').style.display = 'none';
+        // };
+        document.getElementById('cancelViewBtn').onclick = function () {
+            document.getElementById('viewRoleModal').style.display = 'none';
+        };
+
+        // Fetch role details and open the View/Edit modal
+        //  async function openViewModal(roleId) {
+        //     const modal = document.getElementById('viewRoleModal');
+        //     const roleNameInput = document.getElementById('role-name');
+        //     const inputTags = document.getElementById('inputTags');
+        //     const permissionDropdown = document.getElementById('permissionDropdown');
+
+        //     try {
+        //         const response = await fetch(`/admin/roles/${roleId}`);
+        //         const roleData = await response.json();
+        //         console.log(roleData);
+
+        //         // Populate modal with role data
+        //         roleNameInput.value = roleData.role;
+        //         inputTags.innerHTML = '';  // Clear any existing tags
+
+        //         // Reset all dropdown options
+        //         permissionDropdown.querySelectorAll('option').forEach(option => {
+        //             option.style.display = 'block';  // Make all options visible
+        //         });
+
+        //         // Populate permissions as tags
+        //         roleData.role.permissions.forEach(permission => {
+        //             const tag = document.createElement('div');
+        //             tag.classList.add('tag');
+        //             tag.innerHTML = `<span>${permission}</span><span class="remove-tag">&times;</span>`;
+        //             inputTags.appendChild(tag);
+
+        //             // Hide the assigned permission from the dropdown
+        //             const optionToHide = document.querySelector(`#permissionDropdown option[value="${permission}"]`);
+        //             if (optionToHide) {
+        //                 optionToHide.style.display = 'none';
+        //             }
+
+        //             // Remove permission tag on click
+        //             tag.querySelector('.remove-tag').addEventListener('click', function() {
+        //                 inputTags.removeChild(tag);
+        //                 optionToHide.style.display = 'block';  // Show the option again
+        //             });
+        //         });
+
+        //         // Open modal
+        //         modal.style.display = 'block';
+
+        //     } catch (error) {
+        //         console.error('Error fetching role details:', error);
+        //     }
+        // }
+
+        function openViewModal(roleId) {
+            // Make the request to get role details using roleId
+            fetch(`/admin/roles/${roleId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const role = data.role;
+
+                        // Populate modal fields with role data
+                        document.getElementById('role-name').value = role.role;
+
+                        // Join the permissions array to display in a readable format
+                        document.getElementById('role-permissions').innerText = role.permissions.join(', ');
+
+                        // Convert the createdAt date to a readable format
+                        const createdAtDate = new Date(role.createdAt);
+                        document.getElementById('role-createdAt').innerText = createdAtDate.toLocaleString();
+
+                        // Open the modal
+                        const modal = document.getElementById('viewRoleModal');
+                        modal.style.display = 'block';
+                    } else {
+                        console.error('Failed to fetch role details');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching role details:', error);
+                });
+        }
+
+        async function deleteRole(roleId) {
+            try {
+                const response = await fetch(`/admin/roles/${roleId}`, {
+                    method: 'DELETE',
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Role deleted successfully');
+                    // Optionally refresh the table or remove the row
+                    fetchDashboardData();  // Reload roles
+                } else {
+                    alert('Error deleting role');
+                }
+            } catch (error) {
+                console.error('Error deleting role:', error);
+            }
+        }
+
+        const createRoleForm = document.querySelector('#createRoleForm');
+
+        createRoleForm.addEventListener('submit', function (event) {
+            alert('user create initiate...');
+            event.preventDefault();
+
+            // Capture form data
+            const roleName = document.getElementById('create-role-name').value;
+            const permissions = Array.from(document.querySelectorAll('#createInputTags .tag span:first-child')).map(tag => tag.innerText);
+
+            // Log the form data for debugging (or send it to the backend via AJAX)
+            console.log('Role Name:', roleName);
+            console.log('Permissions:', permissions);
+
+            // Example: Sending data to the backend using fetch (assuming an API endpoint exists)
+            fetch('/admin/createRole', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ roleName, permissions })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Role created successfully!');
+                        createRoleModal.style.display = 'none';  // Close the modal
+                        // Optionally, refresh the roles table or update the UI to reflect the new role
+                    } else {
+                        alert('Failed to create role');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while creating the role');
+                });
+        });
+
+        const logout = () => {
+            const sessionStorage = window.sessionStorage.clear();
+            location.replace('/');
+        }
+        document.querySelector('#logout').addEventListener('click', logout);
+        
+    </script>
+
+</body>
+
+</html>

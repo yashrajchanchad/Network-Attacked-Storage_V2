@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles for the modal and form */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 40%;
+            max-width: 600px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .input-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 40px;
+        }
+
+        .tag {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tag .remove-tag {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .dropdown-select {
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 5px;
+            position: absolute;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-select option {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .dropdown-select option:hover {
+            background-color: #ecf0f1;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .save-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="manage_users.html">Manage Users</a>
+            <a href="manage_roles.html">Manage Roles</a>
+            <a href="change_password.html">Change Password</a>
+            <a href="/" class="file-access-btn">File Access Storage</a>
+            <a href="#" id="logout">Logout</a>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <header>Manage Users</header>
+                <button class="create-btn" id="createUserBtn">Create User</button>
+            </div>
+            <table id="user-table">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Creating New User -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCreateModal">&times;</span>
+            <h2>Create New User</h2>
+            <form>
+                <div class="form-group">
+                    <label for="user-name">Name</label>
+                    <input type="text" id="user-name" name="user-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="roles">Select Roles</label>
+                    <div id="roleTags" class="input-tags"></div>
+                    <input id="role-input" type="text" placeholder="Add role" autocomplete="off" />
+                    <div id="roleDropdown" class="dropdown-select">
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                        <option value="viewer">Viewer</option>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn" id="cancelCreateBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Editing User -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeEditModal">&times;</span>
+            <h2>Edit User</h2>
+            <form id="editUserForm" onsubmit="updateUser(event)">
+                <div class="form-group">
+                    <label for="edit-user-name">Name</label>
+                    <input type="text" id="edit-user-name" value="" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email" value="">
+                </div>
+                <div class="form-group">
+                    <label for="edit-role">Role</label>
+                    <input type="text" id="edit-role" value="" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fetch Data into table -->
+    <script defer>
+        const table = document.getElementById('user-table');
+        const fetchDashboardData = async () => {
+            const data = fetch('/admin/usersAll')
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        res.users.forEach(user => {
+                            const row = `
+                        <tr>
+                            <td>${user._id}</td>
+                            <td>${user.username}</td>
+                            <td class='td-email'>${user.email ? user.email : '-'}</td>
+                            <td>${user.role}</td>
+                            <td>
+                                <button onclick="viewUserProfile('${user._id}')">View</button>
+                                <button onclick="openEditUserModal('${user._id}')">Edit</button>
+                                <button onclick="deleteUser('${user._id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                            table.insertAdjacentHTML('beforeend', row);
+                        });
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        fetchDashboardData();
+    </script>
+
+    <script defer>
+        const userLoggedIn = sessionStorage.getItem('nas-token');
+        if(!userLoggedIn) window.location.href = '/login.html';
+        
+        // Open and Close Modals
+        const createUserBtn = document.getElementById('createUserBtn');
+        const createUserModal = document.getElementById('createUserModal');
+        const closeCreateModal = document.getElementById('closeCreateModal');
+        const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+
+        const editUserModal = document.getElementById('editUserModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+        const roleInput = document.getElementById('role-input');
+        const roleDropdown = document.getElementById('roleDropdown');
+        const roleTags = document.getElementById('roleTags');
+        let selectedRoles = [];
+
+        // Open modal for creating a user
+        createUserBtn.onclick = function () {
+            createUserModal.style.display = 'block';
+        };
+
+        // Close create user modal
+        closeCreateModal.onclick = function () {
+            createUserModal.style.display = 'none';
+        };
+        cancelCreateBtn.onclick = function () {
+            createUserModal.style.display = 'none';
+        };
+
+        // Role selection logic
+        roleInput.addEventListener('focus', function () {
+            roleDropdown.style.display = 'block';
+        });
+
+        roleDropdown.addEventListener('click', function (event) {
+            if (event.target.tagName === 'OPTION') {
+                const value = event.target.value;
+                const text = event.target.innerText;
+
+                // Create tag element
+                const tag = document.createElement('div');
+                tag.classList.add('tag');
+                tag.innerHTML = `<span>${text}</span><span class="remove-tag">&times;</span>`;
+
+                // Append tag to the roleTags container
+                roleTags.appendChild(tag);
+
+                // Remove option from dropdown
+                event.target.style.display = 'none';
+
+                // Remove tag on click of the cross button
+                tag.querySelector('.remove-tag').addEventListener('click', function () {
+                    roleTags.removeChild(tag);
+                    selectedRoles = selectedRoles.filter(role => role !== value);
+                    event.target.style.display = 'block'; // Show the option again
+                });
+            }
+        });
+
+        // Close dropdown if clicked outside
+        window.addEventListener('click', function (event) {
+            if (!roleDropdown.contains(event.target) && event.target !== roleInput) {
+                roleDropdown.style.display = 'none';
+            }
+        });
+
+        // Function to send create user API request
+        const createUserApi = async (userData) => {
+            try {
+                const response = await fetch('/admin/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                const result = await response.json();
+                console.log(result);
+
+                if (result.success) {
+                    alert(result.message);
+                    createUserModal.style.display = 'none';
+                    location.reload();
+                } else {
+                    alert('Error creating user: ' + result.message);
+                }
+            } catch (error) {
+                console.log('Error:', error);
+                alert('An error occurred while creating the user.');
+            }
+        };
+
+        // Function to delete a user
+        async function deleteUser(userId) {
+            const confirmation = confirm("Are you sure you want to delete this user?");
+            if (!confirmation) return;
+
+            try {
+                const response = await fetch('/admin/delete-user', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId })
+                });
+
+                const result = await response.json();
+                console.log(result);
+
+                if (result.success) {
+                    alert(result.message);
+                    // document.querySelector(`#user-${userId}`).remove();
+                    location.reload();
+                } else {
+                    alert('Failed to delete user. Try again later.');
+                }
+            } catch (err) {
+                console.error("Error deleting user:", err);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        // Open modal for editing a user
+        async function openEditUserModal(userId) {
+            try {
+                // Fetch user data from server
+                const response = await fetch(`/admin/users/${userId}`);
+                const jsonResponse = await response.json();
+                const user = jsonResponse.user;
+
+                if (response.ok && user) {
+                    // document.getElementById('editUserId').value = user._id;
+                    document.getElementById('edit-user-name').value = user.username;
+                    document.getElementById('edit-email').value = user.email;
+                    document.getElementById('edit-role').value = user.role;
+
+                    document.getElementById('editUserModal').style.display = 'block';
+                } else {
+                    alert('User not found');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('editUserModal').style.display = 'none';
+        }
+
+        // Function to handle form submission and send the update request
+        async function updateUser(event) {
+            event.preventDefault();
+
+            // const userId = document.getElementById('editUserId').value;
+            const username = document.getElementById('edit-user-name').value;
+            const email = document.getElementById('edit-email').value;
+            const role = document.getElementById('edit-role').value;
+
+            // Prepare the request body
+            const userData = {
+                // userId: userId,
+                username: username,
+                email: email,
+                role: role
+            };
+
+            try {
+                // Send POST request to update user
+                const response = await fetch('/admin/update-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                console.log(result);
+
+                if (result.success) {
+                    alert('User updated successfully');
+                    closeModal();
+                    location.reload();
+                } else {
+                    alert(result.message || 'Failed to update user');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+
+        // Close edit user modal
+        closeEditModal.onclick = function () {
+            editUserModal.style.display = 'none';
+        };
+        cancelEditBtn.onclick = function () {
+            editUserModal.style.display = 'none';
+        };
+
+        // Function to handle viewing a user's profile
+        function viewUserProfile(userId) {
+            window.location.href = `user_profile.html?user=${userId}`;
+        }
+
+        // const saveBtn = document.getElementById('save-btn');
+        const saveBtn = document.querySelector('.save-btn');
+
+        // Capture form data and send it to the API on submit
+        saveBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            const userName = document.getElementById('user-name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!userName || !password) {
+                alert('Please fill out all required fields.');
+                return;
+            }
+
+            const userData = {
+                username: userName,
+                email: email,
+                password: password,
+                roles: selectedRoles
+            };
+
+            createUserApi(userData);
+        });
+
+    const logout = () => {
+        const sessionStorage = window.sessionStorage.clear();
+        location.replace('/');
+    }
+    document.querySelector('#logout').addEventListener('click', logout);
+
+    </script>
+
+</body>
+
+</html>

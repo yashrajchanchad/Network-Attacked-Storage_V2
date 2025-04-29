@@ -1,0 +1,1 @@
+export const storageDir = 'D:\MIT ONLINE DATA\SEM 3\Mini Project';

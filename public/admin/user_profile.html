@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Profile Page Styling */
+        .profile-container {
+            max-width: 600px;
+            margin: auto;
+            margin-top: 2rem;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header h1 {
+            margin: 1rem;
+            color: #3498db;
+        }
+
+        .profile-info {
+            margin-bottom: 10px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: 10px;
+        }
+
+        .profile-info span {
+            color: #34495e;
+        }
+
+        .back-btn {
+            display: block;
+            margin: 20px auto;
+            margin-bottom: 0;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background-color: #2980b9;
+        }
+
+        #userName,
+        #userEmail,
+        #userRole {
+            text-transform: capitalize;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="admin-panel">
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="manage_users.html">Manage Users</a>
+            <a href="manage_roles.html">Manage Roles</a>
+            <a href="change_password.html">Change Password</a>
+            <a href="/" class="file-access-btn">File Access Storage</a>
+            <a href="#" id="logout">Logout</a>
+        </div>
+
+        <div class="content">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <h1>User Profile</h1>
+                </div>
+                <div class="profile-info">
+                    <label for="name">Name:</label>
+                    <span id="userName">John Doe</span>
+                </div>
+                <div class="profile-info">
+                    <label for="email">Email:</label>
+                    <span id="userEmail">johndoe@example.com</span>
+                </div>
+                <div class="profile-info">
+                    <label for="role">Role:</label>
+                    <span id="userRole">Admin</span>
+                </div>
+
+                <a href="manage_users.html" class="back-btn">Back to Users</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userLoggedIn = sessionStorage.getItem('nas-token');
+        if(!userLoggedIn) window.location.href = '/login.html';
+        
+        // Retrieve user data from the query parameters in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user');
+
+        const fetchDashboardData = async () => {
+            const data = fetch(`/admin/users/${userId}`)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        const user = res.user;
+                        if (user) {
+                            document.getElementById('userName').textContent = user.username;
+                            document.getElementById('userEmail').textContent = user.email;
+                            document.getElementById('userRole').textContent = user.role;
+                        } else {
+                            document.getElementById('userName').textContent = 'User not found';
+                            document.getElementById('userEmail').textContent = '-';
+                            document.getElementById('userRole').textContent = '-';
+                        }
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        fetchDashboardData();
+
+        const logout = () => {
+            const sessionStorage = window.sessionStorage.clear();
+            location.replace('/');
+        }
+        document.querySelector('#logout').addEventListener('click', logout);
+    </script>
+
+</body>
+
+</html>

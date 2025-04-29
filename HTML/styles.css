@@ -1,0 +1,170 @@
+/* General Styles for Admin Panel */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+}
+
+.admin-panel {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    padding: 15px 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+    display: block;
+    transition: padding-left 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #34495e;
+    padding-left: 20px;
+}
+
+.sidebar .file-access-btn {
+    margin-top: auto;
+    background-color: #1abc9c;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar .file-access-btn:hover {
+    background-color: #16a085;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ecf0f1;
+}
+
+header {
+    font-size: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 20px;
+    color: #34495e;
+    font-weight: 600;
+}
+
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.create-btn{
+    font-size: 1.2rem;
+    padding: 0.7rem 1.5rem;
+}
+
+/* Dashboard Styles */
+.dashboard {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.card {
+    width: 100%;
+    background-color: #3498db;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.card p {
+    font-size: 2.4rem;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+/* Manage Users & Roles Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #3498db;
+    color: white;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Change Password Form */
+.form-group {
+    margin-bottom: 15px;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+button.submit-btn {
+    background-color: #2ecc71;
+}
+
+button.cancel-btn {
+    background-color: #e74c3c;
+}

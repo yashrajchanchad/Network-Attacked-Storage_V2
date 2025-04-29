@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Access Storage</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="header" role="heading">
+    <h1>Network Access Storage</h1>
+    <button id="dashboard-btn">Dashboard</button>
+  </div>
+  <div class="path">
+    <button id="backButton" style="display:none;">Back</button>
+    <div id="breadcrumb"></div>
+  </div>
+  <div id="main" role="main">
+    <div class="new-items-create">
+      <form id="uploadForm">
+        <span>Upload Files</span>
+        <div>
+          <input type="file" id="fileInput" multiple>
+          <button type="submit">Upload Files</button>
+        </div>
+      </form>
+      <form id="folderUploadForm">
+        <span>Upload Folder</span>
+        <div>
+          <input type="file" id="folderInput" webkitdirectory multiple>
+          <button type="submit">Upload Folder</button>
+        </div>
+      </form>
+      <form id="createFolderForm">
+        <span>Create New Folder</span>
+        <div>
+          <input type="text" id="folderNameInput" placeholder="Folder Name">
+          <button type="submit">Create</button>
+        </div>
+      </form>
+      <div id="detailsPanel" style="border:1px solid #ccc; padding: 10px; margin-top: 20px;">
+        <h3>Details</h3>
+        <p>Select a file or folder to see its details.</p>
+      </div>
+    </div>
+    <ul id="fileList"></ul>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
